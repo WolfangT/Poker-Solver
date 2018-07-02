@@ -1,4 +1,7 @@
-import poker
+"""strategy.py
+"""
+
+from rsolver import poker
 
 
 class StrategyTreeNode:
@@ -18,7 +21,8 @@ class StrategyTree:
         self.board = board
         self.plans = []
         self.starting_pot_size = starting_pot_size
-        self.root = self._generate_tree(starting_pot_size, stack_size, bet_size)
+        self.root = self._generate_tree(
+            starting_pot_size, stack_size, bet_size)
 
     def amount_gained(self, pot_size):
         return (pot_size + self.starting_pot_size) / 2
@@ -55,8 +59,8 @@ class StrategyTree:
             new_pot_size = current_pot_size * (1 + 2 * bet_size)
             current.f = self.create_node(path + 'f', current_pot_size)
             if (new_pot_size - starting_pot_size) / 2 >= stack_size:
-                current.c = self.create_node(path + 'c',
-                                             2 * stack_size + starting_pot_size)
+                current.c = self.create_node(
+                    path + 'c', 2 * stack_size + starting_pot_size)
             else:
                 current.c = self.create_node(path + 'c', new_pot_size)
                 current.r = self.create_node(path + 'r', new_pot_size)
@@ -86,13 +90,17 @@ class StrategyTree:
         total_ev = 0
         if player == 'ip':
             for hand, weight in hand_range.items():
-                ev_r, plan_r = self.get_highest_ev_plan(player, hand, self.root.r, 'r')
-                ev_c, plan_c = self.get_highest_ev_plan(player, hand, self.root.c, 'c')
+                ev_r, plan_r = self.get_highest_ev_plan(
+                    player, hand, self.root.r, 'r')
+                ev_c, plan_c = self.get_highest_ev_plan(
+                    player, hand, self.root.c, 'c')
                 total_ev += weight * (ev_r + ev_c)
         elif player == 'oop':
             for hand, weight in hand_range.items():
-                ev_r, plan_r = self.get_highest_ev_plan(player, hand, self.root.r, 'r')
-                ev_c, plan_c = self.get_highest_ev_plan(player, hand, self.root.c, 'c')
+                ev_r, plan_r = self.get_highest_ev_plan(
+                    player, hand, self.root.r, 'r')
+                ev_c, plan_c = self.get_highest_ev_plan(
+                    player, hand, self.root.c, 'c')
                 total_ev += weight * max(ev_r, ev_c)
         else:
             raise ValueError("Player must be 'ip' or 'oop'")
@@ -115,12 +123,14 @@ class StrategyTree:
                 if current.f is not None:
                     ev += (current.f.range.size(remove=hand)
                            * self.amount_gained(current.pot_size))
-                equity = poker.equity_hand_vs_range(hand, current.c.range, self.board)
+                equity = poker.equity_hand_vs_range(
+                    hand, current.c.range, self.board)
                 ev += (current.c.range.size(remove=hand)
                        * (equity * current.c.pot_size
                           - self.amount_lost(current.c.pot_size)))
             else:
-                equity = poker.equity_hand_vs_range(hand, current.range, self.board)
+                equity = poker.equity_hand_vs_range(
+                    hand, current.range, self.board)
                 plan_ev = (ev
                            + current.range.size(remove=hand)
                            * (equity

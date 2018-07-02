@@ -1,6 +1,7 @@
-import poker
-import time
 import cProfile
+import time
+
+from rsolver import poker
 
 n = 10000
 handlist = []

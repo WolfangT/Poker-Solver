@@ -1,6 +1,6 @@
-import poker
 import unittest
-import solver
+
+from rsolver import poker, solver
 
 
 class TestPoker(unittest.TestCase):
@@ -45,15 +45,25 @@ class TestPoker(unittest.TestCase):
         self.assertEqual(poker.evaluate_hand(self.steel_wheel), (8, 3))
         self.assertEqual(poker.evaluate_hand(self.quads), (7, (6, 3)))
         self.assertEqual(poker.evaluate_hand(self.full_house), (6, (0, 7)))
-        self.assertEqual(poker.evaluate_hand(self.extra_full_house), (6, (10, 3)))
-        self.assertEqual(poker.evaluate_hand(self.flush), (5, (10, 6, 4, 3, 2)))
+        self.assertEqual(
+            poker.evaluate_hand(
+                self.extra_full_house), (6, (10, 3)))
+        self.assertEqual(
+            poker.evaluate_hand(self.flush),
+            (5, (10, 6, 4, 3, 2)))
         self.assertEqual(poker.evaluate_hand(self.straight), (4, 12))
         self.assertEqual(poker.evaluate_hand(self.wheel), (4, 3))
         self.assertEqual(poker.evaluate_hand(self.trips), (3, (6, 5, 3)))
         self.assertEqual(poker.evaluate_hand(self.two_pair), (2, (9, 6, 11)))
-        self.assertEqual(poker.evaluate_hand(self.one_pair), (1, (8, 10, 9, 3)))
-        self.assertEqual(poker.evaluate_hand(self.high_card), (0, (11, 8, 7, 4, 3)))
-        self.assertEqual(poker.evaluate_hand(self.five_cards_trips), (3, (12, 6, 2)))
+        self.assertEqual(
+            poker.evaluate_hand(
+                self.one_pair), (1, (8, 10, 9, 3)))
+        self.assertEqual(
+            poker.evaluate_hand(self.high_card),
+            (0, (11, 8, 7, 4, 3)))
+        self.assertEqual(
+            poker.evaluate_hand(
+                self.five_cards_trips), (3, (12, 6, 2)))
         with self.assertRaises(ValueError):
             poker.evaluate_hand(self.four_cards)
         with self.assertRaises(ValueError):
@@ -63,11 +73,11 @@ class TestPoker(unittest.TestCase):
         equity = poker.equity_hand_vs_range(self.pocket_kings,
                                             self.range1,
                                             self.board1)
-        self.assertEqual(equity, 2/3)
+        self.assertEqual(equity, 2 / 3)
         equity = poker.equity_hand_vs_range(self.pocket_fives,
                                             self.range1,
                                             self.board1)
-        self.assertEqual(equity, 3/4)
+        self.assertEqual(equity, 3 / 4)
 
     def test_equity_range_vs_range(self):
         equity = poker.equity_range_vs_range(self.range1,
@@ -76,12 +86,14 @@ class TestPoker(unittest.TestCase):
         self.assertEqual(equity, 0.3)
 
     def test_solver(self):
-        s = solver.Solver(self.board2, self.rangeAKQ, self.rangeAKQ, 'ip', .5, .5)
+        s = solver.Solver(self.board2, self.rangeAKQ,
+                          self.rangeAKQ, 'ip', .5, .5)
         strat = s.create_optimal_strategy()
         opp_value = s.evaluate_strategy(strat.x)
         self.assertAlmostEqual(2.833, opp_value, places=3)
 
-        s = solver.Solver(self.board2, self.rangeAKQ, self.rangeAKQ, 'oop', .5, .5)
+        s = solver.Solver(self.board2, self.rangeAKQ,
+                          self.rangeAKQ, 'oop', .5, .5)
         strat = s.create_optimal_strategy()
         opp_value = s.evaluate_strategy(strat.x)
         self.assertAlmostEqual(3.167, opp_value, places=3)

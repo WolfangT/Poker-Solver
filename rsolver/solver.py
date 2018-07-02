@@ -1,7 +1,11 @@
-import strategy
-import poker
-from scipy.optimize import minimize
+"""solver.py
+"""
+
 import numpy as np
+from scipy.optimize import minimize
+
+from rsolver.poker import Range
+from rsolver.strategy import StrategyTree
 
 
 class Solver:
@@ -11,8 +15,8 @@ class Solver:
         self.villain = 'ip' if hero == 'oop' else 'oop'
         self.hero_range = hero_range
         self.villain_range = villain_range
-        self.strategy_tree = strategy.StrategyTree(board, starting_pot_size, stack_size,
-                                                   bet_size)
+        self.strategy_tree = StrategyTree(
+            board, starting_pot_size, stack_size, bet_size)
 
     def create_optimal_strategy(self):
         plans = self.strategy_tree.get_plans(self.hero)
@@ -42,24 +46,26 @@ class Solver:
             for i, weight in enumerate(self.hero_range.hand_weights.values()):
                 for j in range(num_plans):
                     initial_guess[i + j * num_hands] = weight / num_plans
-                constraints.append({'type': 'eq',
-                                    'fun': make_sum_constraint(num_hands, i, weight)})
+                constraints.append(
+                    {'type': 'eq',
+                     'fun': make_sum_constraint(num_hands, i, weight)})
         elif self.hero == 'ip':
             num_bet_plans = len([p for p in plans if p[0] == 'r'])
             for i, weight in enumerate(self.hero_range.hand_weights.values()):
                 for j in range(num_bet_plans):
                     initial_guess[i + j * num_hands] = weight / num_bet_plans
                 for j in range(num_bet_plans, num_plans):
-                    initial_guess[i + j * num_hands] = (weight
-                                                        / (num_plans - num_bet_plans))
+                    initial_guess[i +
+                                  j *
+                                  num_hands] = (weight /
+                                                (num_plans -
+                                                 num_bet_plans))
                 constraints.append(
                     {'type': 'eq',
                      'fun': make_sum_constraint(num_hands, i, weight, 0,
                                                 num_bet_plans * num_hands)})
-                constraints.append(
-                    {'type': 'eq',
-                     'fun': make_sum_constraint(num_hands, i, weight,
-                                                num_bet_plans * num_hands, num_args)})
+                constraints.append({'type': 'eq', 'fun': make_sum_constraint(
+                    num_hands, i, weight, num_bet_plans * num_hands, num_args)})
 
         bounds = [(0, None) for _ in range(num_args)]
         return minimize(self.evaluate_strategy, initial_guess, method='SLSQP',
@@ -71,10 +77,10 @@ class Solver:
         idx = 0
 
         for plan in plans:
-            plan_range = poker.Range()
+            plan_range = Range()
             for hand in self.hero_range.hand_weights:
                 plan_range.hand_weights[hand] = arr[idx]
                 idx += 1
             self.strategy_tree.modify_nodes_by_plan(plan, plan_range)
-        return self.strategy_tree.create_counter_strategy(self.villain,
-                                                          self.villain_range.hand_weights)
+        return self.strategy_tree.create_counter_strategy(
+            self.villain, self.villain_range.hand_weights)

@@ -1,6 +1,9 @@
-from collections import Counter, defaultdict, namedtuple
-from itertools import islice, chain
+"""poker.py
+"""
+
 import random
+from collections import Counter, defaultdict, namedtuple
+from itertools import chain, islice
 
 RankCount = namedtuple("Rankcount", ["count", "rank"])
 
@@ -38,7 +41,9 @@ class Range:
             self.hand_weights = defaultdict(float, hand_weights)
 
     def size(self, remove=()):
-        return sum(w for h, w in self.hand_weights.items() if set(h).isdisjoint(remove))
+        return sum(
+            w for h, w in self.hand_weights.items()
+            if set(h).isdisjoint(remove))
 
     def normalize(self):
         mult = 1 / self.size()
@@ -53,8 +58,8 @@ class Range:
         return Range(result)
 
     def __repr__(self):
-        return ('Range with size ' + str(self.size()) + ':\n'
-                + '\n'.join(str(h) + ': ' + str(w) for h, w in self.hand_weights.items()))
+        return ('Range with size ' + str(self.size()) + ':\n' + '\n'.join(
+            str(h) + ': ' + str(w) for h, w in self.hand_weights.items()))
 
 
 DECK = tuple(Card(rank, suit) for rank in range(13) for suit in range(4))
@@ -153,7 +158,8 @@ def evaluate_hand(cards):
     else:
         straightflush = None
     rank_counts = Counter(card.rank for card in cards)
-    rank_counts = [RankCount(count, item) for item, count in rank_counts.items()]
+    rank_counts = [RankCount(count, item)
+                   for item, count in rank_counts.items()]
     rank_counts.sort(reverse=True)
     primary = rank_counts[0]
     secondary = rank_counts[1]
@@ -163,7 +169,11 @@ def evaluate_hand(cards):
         kicker = straightflush
     elif primary.count == 4:
         hand_rank = 7
-        kicker = (rank_counts[0].rank, next(get_kickers(cards, ignore=(primary.rank,))))
+        kicker = (
+            rank_counts[0].rank, next(
+                get_kickers(
+                    cards, ignore=(
+                        primary.rank,))))
     elif primary.count == 3 and secondary.count >= 2:
         hand_rank = 6
         kicker = (primary.rank, secondary.rank)
@@ -175,10 +185,22 @@ def evaluate_hand(cards):
         kicker = straight
     elif primary.count == 3:
         hand_rank = 3
-        kicker = (primary.rank, *islice(get_kickers(cards, ignore=(primary.rank,)), 2))
+        kicker = (
+            primary.rank,
+            *
+            islice(
+                get_kickers(
+                    cards,
+                    ignore=(
+                        primary.rank,
+                    )),
+                2))
     elif primary.count == secondary.count == 2:
         hand_rank = 2
-        extra_kicker = next(get_kickers(cards, ignore=((primary.rank,), secondary.rank)))
+        extra_kicker = next(
+            get_kickers(
+                cards, ignore=(
+                    (primary.rank,), secondary.rank)))
         kicker = (primary.rank, secondary.rank, extra_kicker)
     elif primary.count == 2:
         hand_rank = 1
@@ -191,9 +213,8 @@ def evaluate_hand(cards):
 
 
 def equity_hand_vs_range(hand, villain_range, board):
-    """
-    Calculates the equity of a single hand against a range of hands assuming that there
-    are no cards to come.
+    """Calculates the equity of a single hand against a range of hands
+    assuming that there are no cards to come.
     """
     if not set(hand).isdisjoint(board):
         return 1
@@ -203,7 +224,8 @@ def equity_hand_vs_range(hand, villain_range, board):
     lose = 0.0
     win = 0.0
     for villain_hand, weight in villain_range.hand_weights.items():
-        if set(hand).isdisjoint(villain_hand) and set(villain_hand).isdisjoint(board):
+        if set(hand).isdisjoint(villain_hand) and set(
+                villain_hand).isdisjoint(board):
             villain_hand_value = evaluate_hand(chain(villain_hand, board))
             if hero_hand_value > villain_hand_value:
                 win += weight
