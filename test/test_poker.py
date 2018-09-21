@@ -89,7 +89,9 @@ class TestPoker(unittest.TestCase):
         s = solver.Solver(self.board2, self.rangeAKQ,
                           self.rangeAKQ, 'ip', .5, .5)
         strat = s.create_optimal_strategy()
+        print(strat)
         opp_value = s.evaluate_strategy(strat.x)
+        print(opp_value)
         self.assertAlmostEqual(2.833, opp_value, places=3)
 
         s = solver.Solver(self.board2, self.rangeAKQ,

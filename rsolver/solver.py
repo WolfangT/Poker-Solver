@@ -20,7 +20,7 @@ class Solver:
 
     def create_optimal_strategy(self):
         plans = self.strategy_tree.get_plans(self.hero)
-        num_plans = len(self.strategy_tree.get_plans(self.hero))
+        num_plans = len(plans)
         num_hands = len(self.hero_range.hand_weights)
         num_args = num_plans * num_hands
         initial_guess = np.zeros(num_args)
@@ -75,7 +75,6 @@ class Solver:
         self.strategy_tree.clear_ranges()
         plans = self.strategy_tree.get_plans(self.hero)
         idx = 0
-
         for plan in plans:
             plan_range = Range()
             for hand in self.hero_range.hand_weights:

@@ -1,4 +1,6 @@
 """poker.py
+
+The rules for poker as well many helping functions
 """
 
 import random
@@ -52,8 +54,10 @@ class Range:
 
     def __add__(self, other):
         result = {}
-        for hand in (set(list(self.hand_weights.keys()))
-                     ).union(set(list(other.hand_weights.keys()))):
+        weights = [
+            set(list(w.hand_weights.keys()))
+            for w in (self, other)]
+        for hand in weights[0].union(weights[1]):
             result[hand] = self.hand_weights[hand] + other.hand_weights[hand]
         return Range(result)
 
