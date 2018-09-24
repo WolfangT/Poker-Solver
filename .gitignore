@@ -50,3 +50,4 @@ Temporary Items
 # git
 venv
 *.egg-info/*
+.vscode/*

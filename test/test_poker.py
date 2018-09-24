@@ -4,6 +4,7 @@ from rsolver import poker, solver
 
 
 class TestPoker(unittest.TestCase):
+
     def setUp(self):
         self.straight_flush = poker.make_hand('4h 7h 6h 5h Ah 8h 9h')
         self.steel_wheel = poker.make_hand('2s As 3s 4s 5s 2h 2d')
@@ -39,6 +40,20 @@ class TestPoker(unittest.TestCase):
         self.rangeAKQ = poker.Range({tuple(self.pocket_queens): 1,
                                      tuple(self.pocket_kings): 1,
                                      tuple(self.pocket_aces): 1})
+
+    def test_solver(self):
+        s = solver.Solver(self.board2, self.rangeAKQ,
+                          self.rangeAKQ, 'ip', .5, .5)
+        strat = s.create_optimal_strategy()
+        print(strat)
+        opp_value = s.evaluate_strategy(strat.x)
+        print(opp_value)
+        self.assertAlmostEqual(2.833, opp_value, places=3)
+        s = solver.Solver(self.board2, self.rangeAKQ,
+                          self.rangeAKQ, 'oop', .5, .5)
+        strat = s.create_optimal_strategy()
+        opp_value = s.evaluate_strategy(strat.x)
+        self.assertAlmostEqual(3.167, opp_value, places=3)
 
     def test_evaluate_hand(self):
         self.assertEqual(poker.evaluate_hand(self.straight_flush), (8, 7))
@@ -84,21 +99,6 @@ class TestPoker(unittest.TestCase):
                                              self.range2,
                                              self.board1)
         self.assertEqual(equity, 0.3)
-
-    def test_solver(self):
-        s = solver.Solver(self.board2, self.rangeAKQ,
-                          self.rangeAKQ, 'ip', .5, .5)
-        strat = s.create_optimal_strategy()
-        print(strat)
-        opp_value = s.evaluate_strategy(strat.x)
-        print(opp_value)
-        self.assertAlmostEqual(2.833, opp_value, places=3)
-
-        s = solver.Solver(self.board2, self.rangeAKQ,
-                          self.rangeAKQ, 'oop', .5, .5)
-        strat = s.create_optimal_strategy()
-        opp_value = s.evaluate_strategy(strat.x)
-        self.assertAlmostEqual(3.167, opp_value, places=3)
 
 
 if __name__ == '__main__':

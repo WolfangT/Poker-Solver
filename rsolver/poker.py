@@ -190,14 +190,10 @@ def evaluate_hand(cards):
     elif primary.count == 3:
         hand_rank = 3
         kicker = (
-            primary.rank,
-            *
-            islice(
+            primary.rank, *islice(
                 get_kickers(
                     cards,
-                    ignore=(
-                        primary.rank,
-                    )),
+                    ignore=[primary.rank]),
                 2))
     elif primary.count == secondary.count == 2:
         hand_rank = 2

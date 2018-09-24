@@ -7,5 +7,6 @@ setup(
     packages=['rsolver'],
     install_requires=[
         'scipy',
+        'numpy',
     ],
 )
